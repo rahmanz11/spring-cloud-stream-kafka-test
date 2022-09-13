@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "Teacher",
+  "namespace": "com.example.demo.schema",
+  "fields": [
+    {
+      "name": "id",
+      "type": "int"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "age",
+      "type": "int"
+    },
+    {
+      "name": "subject",
+      "type": "string"
+    }
+  ]
+}

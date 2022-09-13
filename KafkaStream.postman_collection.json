@@ -1,0 +1,31 @@
+{
+	"info": {
+		"_postman_id": "043e8b97-ae3c-4af7-91b3-2b9f91f50e54",
+		"name": "KafkaStream",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/teacher/1/Abdus Sattar/30/CSE",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/teacher/1/Abdus Sattar/30/CSE",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teacher",
+						"1",
+						"Abdus Sattar",
+						"30",
+						"CSE"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
