@@ -1,11 +1,7 @@
 package com.example.demo;
 
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
-
+import com.example.demo.DemoApplication.MessageRequestProducer;
 import com.example.demo.consumer.ConsumerSink;
-import com.example.demo.schema.Teacher;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
@@ -19,7 +15,9 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.TestPropertySource;
 
-import com.example.demo.DemoApplication.MessageRequestProducer;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @EmbeddedKafka(brokerProperties = "log.dir=target/${random.uuid}/embedded-kafka")
@@ -27,9 +25,9 @@ import com.example.demo.DemoApplication.MessageRequestProducer;
         properties = {
                 "spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 "spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration",
-                "spring.cloud.stream.bindings.messageRequestInput.group=group-teacher",
-                "spring.cloud.stream.bindings.messageRequestInput.destination=teacher-details",
-                "spring.cloud.stream.bindings.messageRequestOutput.destination=teacher-details"
+                "spring.cloud.stream.bindings.messageRequestInput.group=group-demo",
+                "spring.cloud.stream.bindings.messageRequestInput.destination=demo-topic",
+                "spring.cloud.stream.bindings.messageRequestOutput.destination=demo-topic"
         })
 public class DemoApplicationTests {
 
@@ -66,14 +64,46 @@ public class DemoApplicationTests {
     private MessageRequestProducer producer;
 
     @Test
-    public void messageIsReceived() {
-        Teacher req = new Teacher(11, "Robert", 40, "History");
+    public void messageIsConsumed() {
+        String data = "{\n" +
+                "   \"eventAttributes\":{\n" +
+                "      \"abb_process_timestamp\":\"2022-09-15, 15:49:00.738Z\",\n" +
+                "      \"abb_event_id\":\"c52eujrs-af68-40htd\",\n" +
+                "      \"stage\":{\n" +
+                "         \"stageDisplayName\":\"Scan - project name\",\n" +
+                "         \"stageNumber\":2,\n" +
+                "         \"startTime\":\"2022-09-02 15:00:51 EST\",\n" +
+                "         \"stageMetadata\":{\n" +
+                "            \"workSpace\":\"sample-python-aws\",\n" +
+                "            \"imageName\":\"sample-python-aws-pipelinename\",\n" +
+                "            \"secure\":\"pass\",\n" +
+                "            \"aquaInstance\":\"onPrem\",\n" +
+                "            \"url\":\"https:\\/\\/docker-image\"\n" +
+                "         },\n" +
+                "         \"pipelineMetadata\":{\n" +
+                "            \n" +
+                "         },\n" +
+                "         \"status\":\"success\"\n" +
+                "      },\n" +
+                "      \"abb_src_event_timestamp\":\"2022-09-15 15:00:51 EST\",\n" +
+                "      \"abb_event_timestamp_utc\":\"2022-09-15T15:48:59Z\",\n" +
+                "      \"pipeline_id\":\"Zafdkjvahjk64\",\n" +
+                "      \"abb_endpoint_type\":\"abb_internal\"\n" +
+                "   },\n" +
+                "   \"eventHeader\":{\n" +
+                "      \"event+activity_type\":\"Scan Result\",\n" +
+                "      \"source_event_id\":\"TEST1\",\n" +
+                "      \"source_system_name\":\"ABCD - APP CONTROLS\",\n" +
+                "      \"event_timestamp\":\"2022-09-15T15:48:59Z\",\n" +
+                "      \"event_channel_type\":\"Development Lifecycle Events\",\n" +
+                "      \"source_application_code\":\"ABCD\"\n" +
+                "   }\n" +
+                "}";
         producer.messageRequestOutput().send(MessageBuilder
-                .withPayload(req)
+                .withPayload(data)
                 .build());
         verify(listener, timeout(5000))
-                .handle(argThat(m -> m.getId().equals(req.getId())));
-
+                .consume(argThat(d -> d.contains("c52eujrs-af68-40htd")));
     }
 
 }
